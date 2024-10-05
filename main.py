@@ -513,10 +513,76 @@ def find_trams_by_stop(stop_name, tram_routes):
     """
     trams_by_stop = []
     for tram, route_info in tram_routes.items():
-        # route_info[-1] містить множину всіх зупинок (direct_route + reverse_route)
         if stop_name in route_info[-1]:
             trams_by_stop.append(tram)
     return trams_by_stop
+
+
+def open_tram_through_stops_window():
+    """
+    Відкриття вікна для перевірки, чи є трамвай, що проходить через всі вибрані зупинки
+    """
+    stops_window = tk.Toplevel()
+    stops_window.title("Пошук трамваю через зупинки")
+
+    label1 = tk.Label(stops_window, text="Виберіть зупинки, через які має проходити трамвай:")
+    label1.pack(pady=10)
+
+    frame = tk.Frame(stops_window)
+    frame.pack(pady=10, padx=25)
+
+    all_stops = get_all_stops_sorted(trams)  # Отримуємо список всіх зупинок
+
+    # Створюємо Listbox для вибору декількох зупинок
+    stops_listbox = tk.Listbox(frame, selectmode=tk.MULTIPLE, height=10, width=50)
+    for stop in all_stops:
+        stops_listbox.insert(tk.END, stop)
+    stops_listbox.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
+
+    search_button = tk.Button(frame, text="Знайти трамвай",
+                              command=lambda: handle_tram_search(stops_listbox, result_text))
+    search_button.grid(row=1, column=0, columnspan=2, pady=10)
+
+    result_text = tk.Text(stops_window, height=5, width=50, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+
+def handle_tram_search(stops_listbox, result_text):
+    """
+    Обробка результату пошуку трамваю через вибрані зупинки
+    """
+    result_text.delete(1.0, tk.END)
+
+    selected_stops = [stops_listbox.get(i) for i in stops_listbox.curselection()]  # Отримуємо вибрані зупинки
+    if not selected_stops:
+        messagebox.showwarning("Недостатньо даних", "Будь ласка, виберіть хоча б одну зупинку.")
+        return
+
+    tram = find_tram_through_stops(selected_stops, trams)
+    if tram:
+        result_text.insert(tk.END, f"Трамвай №{tram} проходить через всі вибрані зупинки.")
+    else:
+        result_text.insert(tk.END, "Немає трамвая, який проходить через всі ці зупинки.")
+
+
+def find_tram_through_stops(selected_stops, tram_routes):
+    """
+    Перевіряє, чи є трамвай, що проходить через всі вибрані зупинки
+
+    Параметри:
+    - selected_stops: список вибраних зупинок
+    - tram_routes: словник маршрутів трамваїв
+
+    Повертає:
+    - номер трамваю, якщо він проходить через всі зупинки
+    - None, якщо такого трамваю немає
+    """
+    for tram, route_info in tram_routes.items():
+        tram_stops = route_info[-1]  # Множина всіх зупинок на маршруті (direct + reverse)
+        if all(stop in tram_stops for stop in selected_stops):
+            return tram
+    return None
+
 
 
 def open_trams_by_stop_window():
@@ -621,6 +687,10 @@ def main():
     button6 = tk.Button(button_frame, text="Пошук трамваїв за зупинкою", width=30, height=2,
                         command=open_trams_by_stop_window)
     button6.grid(row=1, column=2, padx=5, pady=5)
+
+    button7 = tk.Button(button_frame, text="Перевірити трамвай за зупинками", width=30, height=2,
+                        command=open_tram_through_stops_window)  
+    button7.grid(row=2, column=0, columnspan=3, pady=10)  
 
     # Start the main loop
     root.mainloop()
