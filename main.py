@@ -281,7 +281,7 @@ def open_how_many_stops_window():
     end_stop = ttk.Combobox(frame, values=all_stops)
     end_stop.grid(row=1, column=1, padx=5, pady=5)
 
-    search_button = tk.Button(frame, text="Пошуку зупинок",
+    search_button = tk.Button(frame, text="Пошукі зупинок",
                               command=lambda: find_stops(start_stop.get(), end_stop.get(), result_text))
     search_button.grid(row=2, column=0, columnspan=2, pady=10)
 
@@ -506,6 +506,35 @@ def open_tram_scheme_window():
     canvas.draw()
     canvas.get_tk_widget().pack(pady=10)
 
+def get_protocole_of_testing():
+    with open('InternalProtocole.txt', 'w', encoding='utf-8') as file:
+        # Test the process_tram_file function
+        file.write("Test the process_tram_file function\n")
+        trams = process_tram_file('TramsInfo.txt')
+        file.write(f"Number of trams: {len(trams)}\n")
+        for tram, routes in trams.items():
+            # write tram number
+            file.write(f"Tram number: {tram}\n")
+            # write route name
+            file.write(f"Route name: {routes[0]}\n")
+            # write direct route
+            file.write(f"Direct route: {routes[1]}\n")
+            # write reverse route
+            file.write(f"Reverse route: {routes[2]}\n")
+        file.write("\n")
+        file.write("Test the find_trams_by_stop function\n")
+        trams_by_stop = find_trams_by_stop(trams, "Залізничний вокзал")
+        file.write("Expected result: [1, 4, 6, 9]\n")
+        file.write(f"Trams by stop: {trams_by_stop}\n")
+        file.write("\n")
+        file.write("Test the find_best_route function\n")
+        best_route = find_best_route(trams, "Залізничний вокзал", "Площа Ринок")
+        file.write("Expected result: [(1, ['Залізничний вокзал', 'Приміський вокзал', 'Кропивницького', 'Старосольських', 'Львівська політехніка', 'Головна пошта', 'Дорошенка', 'Площа Ринок'], 7)]\n")
+        file.write(f"Best route: {str(best_route)}")
+        file.write("\n")
+        file.close()
+
+get_protocole_of_testing()
 
 def find_trams_by_stop(stop_name, tram_routes):
     """
