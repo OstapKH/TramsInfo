@@ -108,7 +108,7 @@ def find_best_route(tram_routes, start_stop, end_stop):
 def create_route_text(tram_routes, start_stop, end_stop):
     route = find_best_route(tram_routes, start_stop, end_stop)
     if not route:
-        return "Маршрут не знайдено"
+        return "Маршрут не знайдено. Перевірте коректність введених назв зупинок."
 
     route_text = []
     for i, (tram, stops, count) in enumerate(route):
@@ -144,6 +144,32 @@ def get_all_stops_sorted(tram_routes):
     return sorted(all_stops, key=lambda x: [alphabet_index[char] for char in x.lower() if char in alphabet_index])
 
 all_stops = get_all_stops_sorted(trams)
+
+def how_many_stops(tram_routes, start_stop, end_stop):
+    route = find_best_route(tram_routes, start_stop, end_stop)
+    if not route:
+        return "Маршрут не знайдено. Перевірте коректність введених назв зупинок."
+
+    total_stops = sum(count for _, _, count in route)
+    transfers = len(route) - 1
+
+    if total_stops == 1:
+        stops_text = "1 зупинка"
+    elif total_stops in [2, 3, 4]:
+        stops_text = f"{total_stops} зупинки"
+    else:
+        stops_text = f"{total_stops} зупинок"
+
+    if transfers == 1:
+        transfers_text = "з 1 пересадкою"
+    else:
+        transfers_text = f"з {transfers} пересадками"
+
+    if transfers == 0:
+        return f"{stops_text} без пересадки."
+    else:
+        return f"{stops_text} {transfers_text}."
+
 def open_route_window():
     # Create a new window
     route_window = tk.Toplevel()
@@ -192,11 +218,128 @@ def find_route(start, end, result_text):
 
     # Check if entered stops are valid
     if start not in all_stops or end not in all_stops:
-        result_text.insert(tk.END, "Маршрут не знайдено")
+        result_text.insert(tk.END, "Маршрут не знайдено. Перевірте коректність введених назв зупинок.")
         return
 
     route_text = create_route_text(trams, start, end)
     result_text.insert(tk.END, route_text)
+
+def open_how_many_stops_window():
+    # Create a new window
+    stops_window = tk.Toplevel()
+    stops_window.title("Скільки зупинок")
+
+    # Create and place the labels
+    label1 = tk.Label(stops_window, text="Ви хочете дізнатись скільки зупинок між двома зупинками?")
+    label1.pack(pady=10)
+
+    label2 = tk.Label(stops_window, text="Виберіть з списку назви трамвайних зупинок")
+    label2.pack(pady=10)
+
+    # Create a frame to hold the dropdowns and button
+    frame = tk.Frame(stops_window)
+    frame.pack(pady=10)
+
+    # Create and place the dropdowns
+    all_stops = get_all_stops_sorted(trams)
+
+    start_label = tk.Label(frame, text="Початкова зупинка:")
+    start_label.grid(row=0, column=0, padx=5, pady=5)
+    start_stop = ttk.Combobox(frame, values=all_stops)
+    start_stop.grid(row=0, column=1, padx=5, pady=5)
+
+    end_label = tk.Label(frame, text="Зупинка-призначення:")
+    end_label.grid(row=1, column=0, padx=5, pady=5)
+    end_stop = ttk.Combobox(frame, values=all_stops)
+    end_stop.grid(row=1, column=1, padx=5, pady=5)
+
+    # Create and place the search button
+    search_button = tk.Button(frame, text="Пошуку зупинок", command=lambda: find_stops(start_stop.get(), end_stop.get(), result_text))
+    search_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    # Create and place the result text field
+    result_text = tk.Text(stops_window, height=10, width=50, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+def find_stops(start, end, result_text):
+    result_text.delete(1.0, tk.END)
+
+    # Check if fields are empty
+    if not start or not end:
+        messagebox.showwarning("Недостатньо даних", "Будь ласка, введіть усі необхідні дані.")
+        return
+
+    # Check if entered stops are valid
+    if start not in all_stops or end not in all_stops:
+        result_text.insert(tk.END, "Маршрут не знайдено. Перевірте коректність введених назв зупинок.")
+        return
+
+    stops_text = how_many_stops(trams, start, end)
+    result_text.insert(tk.END, stops_text)
+
+
+def open_can_reach_window():
+    # Create a new window
+    reach_window = tk.Toplevel()
+    reach_window.title("Чи можна дістатися")
+
+    # Create and place the labels
+    label1 = tk.Label(reach_window, text="Ви хочете дізнатись чи можна дістатися від однієї зупинки до іншої?")
+    label1.pack(pady=10)
+
+    label2 = tk.Label(reach_window, text="Виберіть з списку назви трамвайних зупинок")
+    label2.pack(pady=10)
+
+    # Create a frame to hold the dropdowns and button
+    frame = tk.Frame(reach_window)
+    frame.pack(pady=10)
+
+    # Create and place the dropdowns
+    all_stops = get_all_stops_sorted(trams)
+
+    start_label = tk.Label(frame, text="Початкова зупинка:")
+    start_label.grid(row=0, column=0, padx=5, pady=5)
+    start_stop = ttk.Combobox(frame, values=all_stops)
+    start_stop.grid(row=0, column=1, padx=5, pady=5)
+
+    end_label = tk.Label(frame, text="Зупинка-призначення:")
+    end_label.grid(row=1, column=0, padx=5, pady=5)
+    end_stop = ttk.Combobox(frame, values=all_stops)
+    end_stop.grid(row=1, column=1, padx=5, pady=5)
+
+    # Create and place the search button
+    search_button = tk.Button(frame, text="Перевірити можливість", command=lambda: find_can_reach(start_stop.get(), end_stop.get(), result_text))
+    search_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    # Create and place the result text field
+    result_text = tk.Text(reach_window, height=10, width=50, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+def find_can_reach(start, end, result_text):
+    result_text.delete(1.0, tk.END)
+
+    # Check if fields are empty
+    if not start or not end:
+        messagebox.showwarning("Недостатньо даних", "Будь ласка, введіть усі необхідні дані.")
+        return
+
+    # Check if entered stops are valid
+    if start not in all_stops or end not in all_stops:
+        result_text.insert(tk.END, "Маршрут не знайдено. Перевірте коректність введених назв зупинок.")
+        return
+
+    route = find_best_route(trams, start, end)
+    if not route:
+        result_text.insert(tk.END, "Маршрут не знайдено. Перевірте коректність введених назв зупинок.")
+        return
+
+    if len(route) == 1:
+        result_text.insert(tk.END, f"Можна, використовуючи трамвай №{route[0][0]}")
+    else:
+        transfers_text = "Можна, з пересадкою"
+        for i in range(len(route) - 1):
+            transfers_text += f" з трамваю №{route[i][0]} на трамвай №{route[i + 1][0]}"
+        result_text.insert(tk.END, transfers_text)
 
 def main():
     # Create the main window
@@ -232,10 +375,11 @@ def main():
     button1 = tk.Button(button_frame, text="Як дістатися від однієї зупинки на іншу", width=30, height=2, command=open_route_window)
     button1.grid(row=0, column=0, padx=5, pady=5)
 
-    button2 = tk.Button(button_frame, text="Чи можна дістатися від зупинки на іншу", width=30, height=2)
+    button2 = tk.Button(button_frame, text="Чи можна дістатися від зупинки на іншу", width=30, height=2,
+                        command=open_can_reach_window)
     button2.grid(row=0, column=1, padx=5, pady=5)
 
-    button3 = tk.Button(button_frame, text="Cкільки зупинок від зупинки до іншої", width=30, height=2)
+    button3 = tk.Button(button_frame, text="Cкільки зупинок від зупинки до іншої", width=30, height=2, command=open_how_many_stops_window)
     button3.grid(row=0, column=2, padx=5, pady=5)
 
     button4 = tk.Button(button_frame, text="Детальний маршрут трамваю", width=30, height=2)
