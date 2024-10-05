@@ -1,7 +1,8 @@
 from collections import deque
 
 import tkinter as tk
-from tkinter import font
+from tkinter import font, ttk, messagebox
+
 
 def process_tram_file(file_path):
     """
@@ -54,6 +55,7 @@ def process_tram_file(file_path):
 
     return trams
 
+trams = process_tram_file('TramsInfo.txt')
 def find_trams_by_stop(tram_routes, stop_name):
     """
         Пошук трамваїв, які зупиняються на заданій зупинці
@@ -103,6 +105,27 @@ def find_best_route(tram_routes, start_stop, end_stop):
 
     return None
 
+def create_route_text(tram_routes, start_stop, end_stop):
+    route = find_best_route(tram_routes, start_stop, end_stop)
+    if not route:
+        return "Маршрут не знайдено"
+
+    route_text = []
+    for i, (tram, stops, count) in enumerate(route):
+        if count == 1:
+            stop_text = "проїдьте 1 зупинку"
+        elif count in [2, 3, 4]:
+            stop_text = f"проїдьте {count} зупинки"
+        else:
+            stop_text = f"проїдьте {count} зупинок"
+
+        if i == 0:
+            route_text.append(f"Скористайтеся трамваєм №{tram}, {stop_text}: " + " - ".join(stops))
+        else:
+            route_text.append(f"\nПересядьте на трамвай №{tram}, {stop_text}: " + " - ".join(stops))
+
+    return ". ".join(route_text)
+
 def get_all_stops_sorted(tram_routes):
     """
     Отримання усіх зупинок, на яких зупиняються трамваї,
@@ -120,10 +143,74 @@ def get_all_stops_sorted(tram_routes):
     # Sort the stops using the custom key
     return sorted(all_stops, key=lambda x: [alphabet_index[char] for char in x.lower() if char in alphabet_index])
 
+all_stops = get_all_stops_sorted(trams)
+def open_route_window():
+    # Create a new window
+    route_window = tk.Toplevel()
+    route_window.title("Пошук маршруту")
+
+    # Create and place the labels
+    label1 = tk.Label(route_window, text="Ви хочете дізнатись як потрапити з однієї зупинки на іншу?")
+    label1.pack(pady=10)
+
+    label2 = tk.Label(route_window, text="Виберіть з списку назви трамвайних зупинок")
+    label2.pack(pady=10)
+
+    # Create a frame to hold the dropdowns and button
+    frame = tk.Frame(route_window)
+    frame.pack(pady=10)
+
+    # Create and place the dropdowns
+    all_stops = get_all_stops_sorted(trams)
+
+    start_label = tk.Label(frame, text="Початкова зупинка:")
+    start_label.grid(row=0, column=0, padx=5, pady=5)
+    start_stop = ttk.Combobox(frame, values=all_stops)
+    start_stop.grid(row=0, column=1, padx=5, pady=5)
+
+    end_label = tk.Label(frame, text="Зупинка-призначення:")
+    end_label.grid(row=1, column=0, padx=5, pady=5)
+    end_stop = ttk.Combobox(frame, values=all_stops)
+    end_stop.grid(row=1, column=1, padx=5, pady=5)
+
+    # Create and place the search button
+    search_button = tk.Button(frame, text="Пошуку маршруту", command=lambda: find_route(start_stop.get(), end_stop.get(), result_text))
+    search_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    # Create and place the result text field
+    result_text = tk.Text(route_window, height=10, width=50, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+
+def find_route(start, end, result_text):
+    result_text.delete(1.0, tk.END)
+
+    # Check if fields are empty
+    if not start or not end:
+        messagebox.showwarning("Недостатньо даних", "Будь ласка, введіть усі необхідні дані.")
+        return
+
+    # Check if entered stops are valid
+    if start not in all_stops or end not in all_stops:
+        result_text.insert(tk.END, "Маршрут не знайдено")
+        return
+
+    route_text = create_route_text(trams, start, end)
+    result_text.insert(tk.END, route_text)
+
 def main():
     # Create the main window
     root = tk.Tk()
     root.title("Довідник")
+
+    # Center the window on the screen
+    window_width = 1000
+    window_height = 400
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_right = int(screen_width / 2 - window_width / 2)
+    root.geometry(f'{window_width}x{window_height}+{position_right}+{position_top}')
 
     # Create a custom font for the bold text
     bold_font = font.Font(root, size=12, weight='bold')
@@ -142,7 +229,7 @@ def main():
     button_frame.pack(pady=10)
 
     # Create and place the buttons
-    button1 = tk.Button(button_frame, text="Як дістатися від однієї зупинки на іншу", width=30, height=2)
+    button1 = tk.Button(button_frame, text="Як дістатися від однієї зупинки на іншу", width=30, height=2, command=open_route_window)
     button1.grid(row=0, column=0, padx=5, pady=5)
 
     button2 = tk.Button(button_frame, text="Чи можна дістатися від зупинки на іншу", width=30, height=2)
@@ -154,9 +241,14 @@ def main():
     button4 = tk.Button(button_frame, text="Детальний маршрут трамваю", width=30, height=2)
     button4.grid(row=1, column=0, padx=5, pady=5)
 
+    button5 = tk.Button(button_frame, text="Схема руху трамваїв міста", width=30, height=2)
+    button5.grid(row=1, column=1, padx=5, pady=5)
+
+    button6 = tk.Button(button_frame, text="Текстовий режим отримання інформації", width=30, height=2)
+    button6.grid(row=1, column=2, padx=5, pady=5)
+
     # Start the main loop
     root.mainloop()
 
 if __name__ == "__main__":
     main()
-
