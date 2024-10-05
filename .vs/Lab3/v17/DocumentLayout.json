@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "D:\\University\\AppliedProgrammingPython\\Lab3\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\University\\AppliedProgrammingPython\\Lab3\\main.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:main.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\University\\AppliedProgrammingPython\\Lab3\\TramsInfo.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:TramsInfo.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\University\\AppliedProgrammingPython\\Lab3\\main.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:main.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\University\\AppliedProgrammingPython\\Lab3\\User Instruction||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:User Instruction||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -51,27 +55,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "TramsInfo.txt",
-              "DocumentMoniker": "D:\\University\\AppliedProgrammingPython\\Lab3\\TramsInfo.txt",
-              "RelativeDocumentMoniker": "TramsInfo.txt",
-              "ToolTip": "D:\\University\\AppliedProgrammingPython\\Lab3\\TramsInfo.txt",
-              "RelativeToolTip": "TramsInfo.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAApAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2024-10-05T13:07:57.294Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "main.py",
               "DocumentMoniker": "D:\\University\\AppliedProgrammingPython\\Lab3\\main.py",
               "RelativeDocumentMoniker": "main.py",
               "ToolTip": "D:\\University\\AppliedProgrammingPython\\Lab3\\main.py",
               "RelativeToolTip": "main.py",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAIYBAAAYAAAA",
+              "ViewState": "AQIAAPIBAAAAAAAAAAAnwAQCAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
               "WhenOpened": "2024-10-05T11:45:16.302Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "User Instruction",
+              "DocumentMoniker": "D:\\University\\AppliedProgrammingPython\\Lab3\\User Instruction",
+              "RelativeDocumentMoniker": "User Instruction",
+              "ToolTip": "D:\\University\\AppliedProgrammingPython\\Lab3\\User Instruction",
+              "RelativeToolTip": "User Instruction",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAABPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-10-05T15:47:40.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TramsInfo.txt",
+              "DocumentMoniker": "D:\\University\\AppliedProgrammingPython\\Lab3\\TramsInfo.txt",
+              "RelativeDocumentMoniker": "TramsInfo.txt",
+              "ToolTip": "D:\\University\\AppliedProgrammingPython\\Lab3\\TramsInfo.txt",
+              "RelativeToolTip": "TramsInfo.txt",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAA3AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2024-10-05T13:07:57.294Z",
               "EditorCaption": ""
             }
           ]

@@ -507,6 +507,63 @@ def open_tram_scheme_window():
     canvas.get_tk_widget().pack(pady=10)
 
 
+def find_trams_by_stop(stop_name, tram_routes):
+    """
+    Знаходить всі трамваї, що проходять через задану зупинку.
+    """
+    trams_by_stop = []
+    for tram, route_info in tram_routes.items():
+        # route_info[-1] містить множину всіх зупинок (direct_route + reverse_route)
+        if stop_name in route_info[-1]:
+            trams_by_stop.append(tram)
+    return trams_by_stop
+
+
+def open_trams_by_stop_window():
+    """
+    Відкриття вікна для пошуку трамваїв за зупинкою
+    """
+    trams_window = tk.Toplevel()
+    trams_window.title("Пошук трамваїв за зупинкою")
+
+    label1 = tk.Label(trams_window, text="Оберіть зупинку з випадаючого списку, щоб побачити доступні трамваї:")
+    label1.pack(pady=10)
+
+    all_stops = get_all_stops_sorted(trams)
+
+    # Create a dropdown (Combobox) for selecting a stop
+    frame = tk.Frame(trams_window)
+    frame.pack(pady=10, padx=25)
+
+    stop_label = tk.Label(frame, text="Зупинка:")
+    stop_label.grid(row=0, column=0, padx=5, pady=5)
+    stop_combobox = ttk.Combobox(frame, values=all_stops)
+    stop_combobox.grid(row=0, column=1, padx=5, pady=5)
+
+    # Text box for displaying trams that go through the selected stop
+    result_text = tk.Text(trams_window, height=10, width=50, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+    def show_trams():
+        stop_name = stop_combobox.get()
+        result_text.delete(1.0, tk.END)
+
+        if stop_name not in all_stops:
+            messagebox.showwarning("Невірна зупинка", "Оберіть зупинку зі списку.")
+            return
+
+        trams_at_stop = find_trams_by_stop(stop_name, trams)
+        if trams_at_stop:
+            result_text.insert(tk.END, f"Трамваї, що їдуть через {stop_name}: {', '.join(map(str, trams_at_stop))}")
+        else:
+            result_text.insert(tk.END, f"Трамваїв через {stop_name} не знайдено.")
+
+    search_button = tk.Button(frame, text="Показати трамваї", command=show_trams)
+    search_button.grid(row=1, column=0, columnspan=2, pady=10)
+
+
+
+
 def main():
     """
     Головна функція для запуску головного вікна програми
@@ -561,7 +618,8 @@ def main():
                         command=open_tram_scheme_window)
     button5.grid(row=1, column=1, padx=5, pady=5)
 
-    button6 = tk.Button(button_frame, text="Текстовий режим отримання інформації", width=30, height=2)
+    button6 = tk.Button(button_frame, text="Пошук трамваїв за зупинкою", width=30, height=2,
+                        command=open_trams_by_stop_window)
     button6.grid(row=1, column=2, padx=5, pady=5)
 
     # Start the main loop
