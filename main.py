@@ -8,7 +8,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import random
 
 
-
 def process_tram_file(file_path):
     """
     Обробка файлу з інформацією про трамвайні маршрути
@@ -407,18 +406,58 @@ def show_tram_route(tram_number, result_text):
     tram_number = int(tram_number)
     route_info = trams[tram_number]
     route_name = route_info[0]
-    direct_route = " - ".join(route_info[1])
-    reverse_route = " - ".join(route_info[2])
+    direct_route = route_info[1]
+    reverse_route = route_info[2]
 
     result_text.insert(tk.END, f"Маршрут №{tram_number}\n")
     result_text.insert(tk.END, f"{route_name}\n")
-    result_text.insert(tk.END, f"Прямий напрямок:\n{direct_route}\n")
-    result_text.insert(tk.END, f"Зворотній напрямок:\n{reverse_route}\n")
+    result_text.insert(tk.END, f"Прямий напрямок:\n{' - '.join(direct_route)}\n")
+    result_text.insert(tk.END, f"Зворотній напрямок:\n{' - '.join(reverse_route)}\n")
 
+    # Create a graph
+    G = nx.Graph()
+    stops = direct_route + reverse_route
+    for i in range(len(stops) - 1):
+        G.add_edge(stops[i], stops[i + 1], tram=tram_number)
 
+    # Clear the previous plot
+    plt.clf()
 
+    # Draw the graph using matplotlib
+    fig, ax = plt.subplots(figsize=(12, 10))
+    pos = nx.spring_layout(G, seed=42, k=0.02)
 
+    # Assign a color to the tram line
+    tram_color = "#" + ''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
 
+    # Draw nodes
+    nx.draw_networkx_nodes(G, pos, node_size=100, node_color="skyblue", edgecolors='k', ax=ax)
+
+    # Draw edges with the tram color
+    nx.draw_networkx_edges(G, pos, edgelist=G.edges(), edge_color=tram_color, ax=ax)
+
+    # Draw labels
+    nx.draw_networkx_labels(G, pos, font_size=8, font_weight="light", ax=ax)
+
+    # Collect all tram numbers for each edge
+    edge_labels = {}
+    for u, v, data in G.edges(data=True):
+        if (u, v) in edge_labels:
+            edge_labels[(u, v)] += f", {data['tram']}"
+        else:
+            edge_labels[(u, v)] = str(data['tram'])
+
+    # Draw edge labels
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', ax=ax)
+
+    # Clear the previous canvas if it exists
+    if hasattr(show_tram_route, 'canvas') and show_tram_route.canvas:
+        show_tram_route.canvas.get_tk_widget().destroy()
+
+    # Embed the plot in the Tkinter window
+    show_tram_route.canvas = FigureCanvasTkAgg(fig, master=result_text.master)
+    show_tram_route.canvas.draw()
+    show_tram_route.canvas.get_tk_widget().pack(pady=10)
 def open_tram_scheme_window():
     # Create a new window
     scheme_window = tk.Toplevel()
