@@ -2,6 +2,11 @@ from collections import deque
 
 import tkinter as tk
 from tkinter import font, ttk, messagebox
+import networkx as nx
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import random
+
 
 
 def process_tram_file(file_path):
@@ -55,7 +60,10 @@ def process_tram_file(file_path):
 
     return trams
 
+
 trams = process_tram_file('TramsInfo.txt')
+
+
 def find_trams_by_stop(tram_routes, stop_name):
     """
         Пошук трамваїв, які зупиняються на заданій зупинці
@@ -69,6 +77,7 @@ def find_trams_by_stop(tram_routes, stop_name):
         if stop_name in routes[1] or stop_name in routes[2]:
             trams.append(tram)
     return trams
+
 
 def find_best_route(tram_routes, start_stop, end_stop):
     """
@@ -99,11 +108,16 @@ def find_best_route(tram_routes, start_stop, end_stop):
                     start_index = routes[direction].index(current_stop)
                     for next_stop in routes[direction][start_index:]:
                         if next_stop == end_stop:
-                            return path + [(tram, routes[direction][start_index:routes[direction].index(next_stop) + 1], routes[direction].index(next_stop) - start_index)]
+                            return path + [(tram, routes[direction][start_index:routes[direction].index(next_stop) + 1],
+                                            routes[direction].index(next_stop) - start_index)]
                         if (next_stop, transfers + 1) not in visited:
-                            queue.append((next_stop, path + [(tram, routes[direction][start_index:routes[direction].index(next_stop) + 1], routes[direction].index(next_stop) - start_index)], transfers + 1))
+                            queue.append((next_stop, path + [(tram, routes[direction][
+                                                                    start_index:routes[direction].index(next_stop) + 1],
+                                                              routes[direction].index(next_stop) - start_index)],
+                                          transfers + 1))
 
     return None
+
 
 def create_route_text(tram_routes, start_stop, end_stop):
     route = find_best_route(tram_routes, start_stop, end_stop)
@@ -126,6 +140,7 @@ def create_route_text(tram_routes, start_stop, end_stop):
 
     return ". ".join(route_text)
 
+
 def get_all_stops_sorted(tram_routes):
     """
     Отримання усіх зупинок, на яких зупиняються трамваї,
@@ -143,7 +158,9 @@ def get_all_stops_sorted(tram_routes):
     # Sort the stops using the custom key
     return sorted(all_stops, key=lambda x: [alphabet_index[char] for char in x.lower() if char in alphabet_index])
 
+
 all_stops = get_all_stops_sorted(trams)
+
 
 def how_many_stops(tram_routes, start_stop, end_stop):
     route = find_best_route(tram_routes, start_stop, end_stop)
@@ -169,6 +186,7 @@ def how_many_stops(tram_routes, start_stop, end_stop):
         return f"{stops_text} без пересадки."
     else:
         return f"{stops_text} {transfers_text}."
+
 
 def open_route_window():
     # Create a new window
@@ -200,7 +218,8 @@ def open_route_window():
     end_stop.grid(row=1, column=1, padx=5, pady=5)
 
     # Create and place the search button
-    search_button = tk.Button(frame, text="Пошуку маршруту", command=lambda: find_route(start_stop.get(), end_stop.get(), result_text))
+    search_button = tk.Button(frame, text="Пошуку маршруту",
+                              command=lambda: find_route(start_stop.get(), end_stop.get(), result_text))
     search_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     # Create and place the result text field
@@ -224,6 +243,7 @@ def find_route(start, end, result_text):
     route_text = create_route_text(trams, start, end)
     result_text.insert(tk.END, route_text)
 
+
 def open_how_many_stops_window():
     # Create a new window
     stops_window = tk.Toplevel()
@@ -238,7 +258,7 @@ def open_how_many_stops_window():
 
     # Create a frame to hold the dropdowns and button
     frame = tk.Frame(stops_window)
-    frame.pack(pady=10)
+    frame.pack(pady=10, padx=25)
 
     # Create and place the dropdowns
     all_stops = get_all_stops_sorted(trams)
@@ -254,12 +274,14 @@ def open_how_many_stops_window():
     end_stop.grid(row=1, column=1, padx=5, pady=5)
 
     # Create and place the search button
-    search_button = tk.Button(frame, text="Пошуку зупинок", command=lambda: find_stops(start_stop.get(), end_stop.get(), result_text))
+    search_button = tk.Button(frame, text="Пошуку зупинок",
+                              command=lambda: find_stops(start_stop.get(), end_stop.get(), result_text))
     search_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     # Create and place the result text field
     result_text = tk.Text(stops_window, height=10, width=50, wrap=tk.WORD)
     result_text.pack(pady=10)
+
 
 def find_stops(start, end, result_text):
     result_text.delete(1.0, tk.END)
@@ -292,7 +314,7 @@ def open_can_reach_window():
 
     # Create a frame to hold the dropdowns and button
     frame = tk.Frame(reach_window)
-    frame.pack(pady=10)
+    frame.pack(pady=10, padx=25)
 
     # Create and place the dropdowns
     all_stops = get_all_stops_sorted(trams)
@@ -308,12 +330,14 @@ def open_can_reach_window():
     end_stop.grid(row=1, column=1, padx=5, pady=5)
 
     # Create and place the search button
-    search_button = tk.Button(frame, text="Перевірити можливість", command=lambda: find_can_reach(start_stop.get(), end_stop.get(), result_text))
+    search_button = tk.Button(frame, text="Перевірити можливість",
+                              command=lambda: find_can_reach(start_stop.get(), end_stop.get(), result_text))
     search_button.grid(row=2, column=0, columnspan=2, pady=10)
 
     # Create and place the result text field
     result_text = tk.Text(reach_window, height=10, width=50, wrap=tk.WORD)
     result_text.pack(pady=10)
+
 
 def find_can_reach(start, end, result_text):
     result_text.delete(1.0, tk.END)
@@ -341,6 +365,109 @@ def find_can_reach(start, end, result_text):
             transfers_text += f" з трамваю №{route[i][0]} на трамвай №{route[i + 1][0]}"
         result_text.insert(tk.END, transfers_text)
 
+
+def open_tram_route_window():
+    # Create a new window
+    tram_route_window = tk.Toplevel()
+    tram_route_window.title("Детальний маршрут трамваю")
+
+    # Create and place the labels
+    label1 = tk.Label(tram_route_window, text="Виберіть номер трамваю для перегляду маршруту")
+    label1.pack(pady=10)
+
+    # Create a frame to hold the dropdown and button
+    frame = tk.Frame(tram_route_window)
+    frame.pack(pady=10, padx=25)
+
+    # Create and place the dropdown
+    tram_numbers = sorted(trams.keys())
+    tram_label = tk.Label(frame, text="Номер трамваю:")
+    tram_label.grid(row=0, column=0, padx=5, pady=5)
+    tram_number = ttk.Combobox(frame, values=tram_numbers)
+    tram_number.grid(row=0, column=1, padx=5, pady=5)
+
+    # Create and place the show route button
+    show_button = tk.Button(frame, text="Показати маршрут",
+                            command=lambda: show_tram_route(tram_number.get(), result_text))
+    show_button.grid(row=1, column=0, columnspan=2, pady=10)
+
+    # Create and place the result text field
+    result_text = tk.Text(tram_route_window, height=15, width=60, wrap=tk.WORD)
+    result_text.pack(pady=10)
+
+
+def show_tram_route(tram_number, result_text):
+    result_text.delete(1.0, tk.END)
+
+    # Check if tram number is valid and is not string
+    if not tram_number or not tram_number.isdigit() or int(tram_number) not in trams:
+        messagebox.showwarning("Недостатньо даних", "Будь ласка, виберіть номер трамваю зі списку.")
+        return
+
+    tram_number = int(tram_number)
+    route_info = trams[tram_number]
+    route_name = route_info[0]
+    direct_route = " - ".join(route_info[1])
+    reverse_route = " - ".join(route_info[2])
+
+    result_text.insert(tk.END, f"Маршрут №{tram_number}\n")
+    result_text.insert(tk.END, f"{route_name}\n")
+    result_text.insert(tk.END, f"Прямий напрямок:\n{direct_route}\n")
+    result_text.insert(tk.END, f"Зворотній напрямок:\n{reverse_route}\n")
+
+
+
+
+
+def open_tram_scheme_window():
+    # Create a new window
+    scheme_window = tk.Toplevel()
+    scheme_window.title("Схема руху трамваїв міста")
+
+    # Create a graph
+    G = nx.Graph()
+
+    # Add nodes and edges from tram routes
+    for tram, routes in trams.items():
+        stops = routes[1] + routes[2]
+        for i in range(len(stops) - 1):
+            G.add_edge(stops[i], stops[i + 1], tram=tram)
+
+    # Draw the graph using matplotlib
+    fig, ax = plt.subplots(figsize=(12, 10))
+    pos = nx.spring_layout(G, seed=42, k=0.02)
+
+    # Assign colors to each tram line
+    tram_colors = {}
+    for tram in trams.keys():
+        tram_colors[tram] = "#" + ''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
+
+    # Draw nodes
+    nx.draw_networkx_nodes(G, pos, node_size=100, node_color="green", edgecolors='k', ax=ax)
+
+    # Draw edges with different colors
+    for u, v, data in G.edges(data=True):
+        nx.draw_networkx_edges(G, pos, edgelist=[(u, v)], edge_color=tram_colors[data['tram']], ax=ax)
+
+    # Draw labels
+    nx.draw_networkx_labels(G, pos, font_size=8, font_weight="light", ax=ax)
+
+    # Collect all tram numbers for each edge
+    edge_labels = {}
+    for u, v, data in G.edges(data=True):
+        if (u, v) in edge_labels:
+            edge_labels[(u, v)] += f", {data['tram']}"
+        else:
+            edge_labels[(u, v)] = str(data['tram'])
+
+    # Draw edge labels
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', ax=ax)
+
+    # Embed the plot in the Tkinter window
+    canvas = FigureCanvasTkAgg(fig, master=scheme_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack(pady=10)
+
 def main():
     # Create the main window
     root = tk.Tk()
@@ -356,13 +483,14 @@ def main():
     root.geometry(f'{window_width}x{window_height}+{position_right}+{position_top}')
 
     # Create a custom font for the bold text
-    bold_font = font.Font(root, size=12, weight='bold')
+    bold_font = font.Font(root, size=40, weight='bold')
 
     # Create and place the labels
     label1 = tk.Label(root, text="Довідка про Львівський трамвай", font=bold_font, fg='green')
     label1.pack(pady=10)
 
-    label2 = tk.Label(root, text="За допомогою цього застосунку ви можете проконсультувати схему руху трамваїв міста Лева.")
+    label2 = tk.Label(root,
+                      text="За допомогою цього застосунку ви можете проконсультувати схему руху трамваїв міста Лева.")
     label3 = tk.Label(root, text="Оберіть опцію серед запропонованих нижче:")
     label2.pack(pady=10, padx=10)
     label3.pack(pady=2)
@@ -372,20 +500,23 @@ def main():
     button_frame.pack(pady=10)
 
     # Create and place the buttons
-    button1 = tk.Button(button_frame, text="Як дістатися від однієї зупинки на іншу", width=30, height=2, command=open_route_window)
+    button1 = tk.Button(button_frame, text="Як дістатися від однієї зупинки на іншу", width=30, height=2,
+                        command=open_route_window)
     button1.grid(row=0, column=0, padx=5, pady=5)
 
     button2 = tk.Button(button_frame, text="Чи можна дістатися від зупинки на іншу", width=30, height=2,
                         command=open_can_reach_window)
     button2.grid(row=0, column=1, padx=5, pady=5)
 
-    button3 = tk.Button(button_frame, text="Cкільки зупинок від зупинки до іншої", width=30, height=2, command=open_how_many_stops_window)
+    button3 = tk.Button(button_frame, text="Cкільки зупинок від зупинки до іншої", width=30, height=2,
+                        command=open_how_many_stops_window)
     button3.grid(row=0, column=2, padx=5, pady=5)
 
-    button4 = tk.Button(button_frame, text="Детальний маршрут трамваю", width=30, height=2)
+    button4 = tk.Button(button_frame, text="Детальний маршрут трамваю", width=30, height=2,
+                        command=open_tram_route_window)
     button4.grid(row=1, column=0, padx=5, pady=5)
 
-    button5 = tk.Button(button_frame, text="Схема руху трамваїв міста", width=30, height=2)
+    button5 = tk.Button(button_frame, text="Схема руху трамваїв міста", width=30, height=2, command=open_tram_scheme_window)
     button5.grid(row=1, column=1, padx=5, pady=5)
 
     button6 = tk.Button(button_frame, text="Текстовий режим отримання інформації", width=30, height=2)
@@ -393,6 +524,7 @@ def main():
 
     # Start the main loop
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
